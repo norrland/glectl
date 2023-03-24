@@ -6,6 +6,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"strings"
 	"text/tabwriter"
@@ -26,9 +27,28 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		client := helper.NewClient()
 
-		ips, err := client.IPs.Reserved(context.Background(), glesys.ReservedIPsParams{})
+		userid, token := helper.GetCredentials()
+		agent := helper.UserAgent()
+
+		client := glesys.NewClient(userid, token, agent)
+
+		ipv6, _ := cmd.Flags().GetBool("ipv6")
+		ipv4, _ := cmd.Flags().GetBool("ipv4")
+
+		log.Printf("ipv4/ipv6? %t/%t", ipv4, ipv6)
+
+		var ipParams glesys.ReservedIPsParams
+		switch af := list_inetf(ipv4, ipv6); af {
+		case "ipv4":
+			ipParams = glesys.ReservedIPsParams{Version: 4}
+		case "ipv6":
+			ipParams = glesys.ReservedIPsParams{Version: 6}
+		default:
+			log.Println("No af set.")
+		}
+
+		ips, err := client.IPs.Reserved(context.Background(), ipParams)
 		if err != nil {
 			cobra.CheckErr(err)
 		}
@@ -65,4 +85,19 @@ func init() {
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
 	// ipListCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	ipListCmd.Flags().BoolP("ipv6", "6", false, "list ipv6 addresses only.")
+	ipListCmd.Flags().BoolP("ipv4", "4", false, "list ipv4 addresses only.")
+	ipListCmd.MarkFlagsMutuallyExclusive("ipv4", "ipv6")
+}
+
+func do_listips() {}
+
+func list_inetf(ipv4 bool, ipv6 bool) string {
+	if ipv4 {
+		return "ipv4"
+	}
+	if ipv6 {
+		return "ipv6"
+	}
+	return "any"
 }
