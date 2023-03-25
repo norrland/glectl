@@ -19,6 +19,7 @@ var serverListCmd = &cobra.Command{
 	Short: "List servers in your current project.",
 	//Long: `A longer description that spans multiple lines and likely contains examples`,
 	Run: func(cmd *cobra.Command, args []string) {
+		dontPrintHeader, _ := cmd.Flags().GetBool("no-headers")
 
 		client := helper.NewClient()
 
@@ -31,7 +32,9 @@ var serverListCmd = &cobra.Command{
 		// TODO: fix nice tabs
 		writer := tabwriter.NewWriter(os.Stdout, 0, 8, 0, '\t', 0)
 		if len(*servers) > 0 {
-			fmt.Fprintln(writer, "platform\tdatacenter\tid\thostname")
+			if !dontPrintHeader {
+				fmt.Fprintln(writer, "platform\tdatacenter\tid\thostname")
+			}
 			for _, srv := range *servers {
 				_, err := fmt.Fprintf(writer, "%s\t%s\t%s\t%s\n", srv.Platform, srv.DataCenter, srv.ID, srv.Hostname)
 				if err != nil {
@@ -45,4 +48,6 @@ var serverListCmd = &cobra.Command{
 
 func init() {
 	serverCmd.AddCommand(serverListCmd)
+
+	serverListCmd.Flags().Bool("no-headers", false, "do not print header")
 }
