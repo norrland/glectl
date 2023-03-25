@@ -10,7 +10,6 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	"github.com/glesys/glesys-go/v6"
 	helper "github.com/norrland/glectl/helpers"
 	"github.com/spf13/cobra"
 )
@@ -26,11 +25,7 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-
-		userid, token := helper.GetCredentials()
-		agent := helper.UserAgent()
-
-		client := glesys.NewClient(userid, token, agent)
+		client := helper.NewClient()
 
 		ips, err := client.IPs.Reserved(context.Background())
 		if err != nil {

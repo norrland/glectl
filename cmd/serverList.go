@@ -9,7 +9,6 @@ import (
 	"os"
 	"text/tabwriter"
 
-	"github.com/glesys/glesys-go/v6"
 	helper "github.com/norrland/glectl/helpers"
 	"github.com/spf13/cobra"
 )
@@ -20,13 +19,8 @@ var serverListCmd = &cobra.Command{
 	Short: "List servers in your current project.",
 	//Long: `A longer description that spans multiple lines and likely contains examples`,
 	Run: func(cmd *cobra.Command, args []string) {
-		//userid := os.Getenv("GLESYS_USERID")
-		//token := os.Getenv("GLESYS_TOKEN")
-		userid, token := helper.GetCredentials()
 
-		agent := helper.UserAgent()
-
-		client := glesys.NewClient(userid, token, agent)
+		client := helper.NewClient()
 
 		servers, err := client.Servers.List(context.Background())
 
