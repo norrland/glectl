@@ -59,7 +59,7 @@ func details(ccmd *cobra.Command, args []string) {
 	writer := tabwriter.NewWriter(os.Stdout, 0, 8, 0, '\t', 0)
 	fmt.Fprintf(
 		writer,
-		"%s\nHostname:\t%s\nIPs:\t%s\nDescription:\t%s\nDatacenter:\t%s\nCPU:\t%d\nRAM:\t%d\nStorage:\t%d\n",
+		"%s\nHostname:\t%s\nIPs:\t%s\nDescription:\t%s\nDatacenter:\t%s\nCPU:\t%d\nRAM:\t%d\nStorage:\t%d\nState:\t%s\n",
 		server.ID,
 		server.Hostname,
 		ips2,
@@ -68,6 +68,7 @@ func details(ccmd *cobra.Command, args []string) {
 		server.CPU,
 		server.Memory,
 		server.Storage,
+		server.State,
 	)
 	writer.Flush()
 }
