@@ -16,7 +16,7 @@ import (
 
 // serverDetailsCmd represents the serverDetails command
 var serverDetailsCmd = &cobra.Command{
-	Use:   "details",
+	Use:   "details SERVERID",
 	Short: "Detailed server information.",
 	Long: `Example:
 
@@ -30,6 +30,13 @@ Datacenter:     Falkenberg
 CPU:            2
 RAM:            4096
 Storage:        40`,
+	Args: cobra.MatchAll(cobra.ExactArgs(1)),
+	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		if len(args) != 0 {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+		return ServerList(cmd, args, toComplete)
+	},
 	Run: details,
 }
 
@@ -63,6 +70,29 @@ func details(ccmd *cobra.Command, args []string) {
 		server.Storage,
 	)
 	writer.Flush()
+}
+
+func ServerList(ccmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+	// log.Printf("ServerList called")
+	client := helper.NewClient()
+
+	var srvList []string
+	servers, err := client.Servers.List(context.Background())
+	if err != nil {
+		cobra.CheckErr(err)
+	}
+
+	toComplete = strings.ToLower(toComplete)
+	for _, srv := range *servers {
+		if strings.HasPrefix(srv.ID, toComplete) {
+			// log.Printf("floff %s\n", srv.ID)
+			// TODO: see if we can output the hostname in some way without adding it to the autocomplete suggestion.
+			// srvList = append(srvList, fmt.Sprintf("%s:%s", srv.ID, srv.Hostname))
+			srvList = append(srvList, srv.ID)
+		}
+	}
+
+	return srvList, cobra.ShellCompDirectiveNoFileComp
 }
 
 func init() {
