@@ -10,6 +10,7 @@ import (
 	"strings"
 	"text/tabwriter"
 
+	"github.com/glesys/glesys-go/v7"
 	helper "github.com/norrland/glectl/helpers"
 	"github.com/spf13/cobra"
 )
@@ -20,7 +21,7 @@ var serverDetailsCmd = &cobra.Command{
 	Short: "Detailed server information.",
 	Long: `Example:
 
-glectl server details kvm12345
+glectl server details [--console] kvm12345
 
 kvm12345
 Hostname:       web.example.com
@@ -29,7 +30,8 @@ Description:	Webserver-01
 Datacenter:     Falkenberg
 CPU:            2
 RAM:            4096
-Storage:        40`,
+Storage:        40
+Console:	https://<console-url> *if --console is used`,
 	Args: cobra.MatchAll(cobra.ExactArgs(1)),
 	ValidArgsFunction: func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
 		if len(args) != 0 {
@@ -43,11 +45,21 @@ Storage:        40`,
 func details(ccmd *cobra.Command, args []string) {
 	client := helper.NewClient()
 
+	getConsole, _ := ccmd.Flags().GetBool("console")
+
 	id := args[0]
 
 	server, err := client.Servers.Details(context.Background(), id)
 	if err != nil {
 		cobra.CheckErr(err)
+	}
+
+	var con *glesys.ServerConsoleDetails
+	if getConsole {
+		con, err = client.Servers.Console(context.Background(), server.ID)
+		if err != nil {
+			cobra.CheckErr(err)
+		}
 	}
 
 	var ips []string
@@ -60,6 +72,7 @@ func details(ccmd *cobra.Command, args []string) {
 	fmt.Fprintf(
 		writer,
 		"%s\nHostname:\t%s\nIPs:\t%s\nDescription:\t%s\nDatacenter:\t%s\nCPU:\t%d\nRAM:\t%d\nStorage:\t%d\nState:\t%s\n",
+
 		server.ID,
 		server.Hostname,
 		ips2,
@@ -70,6 +83,9 @@ func details(ccmd *cobra.Command, args []string) {
 		server.Storage,
 		server.State,
 	)
+	if getConsole {
+		fmt.Fprintf(writer, "Console:\t%s\n", con.URL)
+	}
 	writer.Flush()
 }
 
@@ -86,7 +102,6 @@ func ServerList(ccmd *cobra.Command, args []string, toComplete string) ([]string
 	toComplete = strings.ToLower(toComplete)
 	for _, srv := range *servers {
 		if strings.HasPrefix(srv.ID, toComplete) {
-			// log.Printf("floff %s\n", srv.ID)
 			// TODO: see if we can output the hostname in some way without adding it to the autocomplete suggestion.
 			// srvList = append(srvList, fmt.Sprintf("%s:%s", srv.ID, srv.Hostname))
 			srvList = append(srvList, srv.ID)
@@ -98,4 +113,6 @@ func ServerList(ccmd *cobra.Command, args []string, toComplete string) ([]string
 
 func init() {
 	serverCmd.AddCommand(serverDetailsCmd)
+
+	serverDetailsCmd.Flags().BoolP("console", "c", false, "include console url")
 }
