@@ -1,16 +1,30 @@
 package helper
 
 import (
+	_ "embed"
+	"fmt"
+	"log"
 	"os"
+	"strings"
 
 	"github.com/glesys/glesys-go/v6"
 )
 
-var glectlUserAgent = "glectl/"
 var version = "0.0.1"
 
+//go:embed git-ref.txt
+var Commit string
+
+func Version() string {
+	if len(Commit) > 0 {
+		commit := strings.TrimSuffix(Commit, "\n")
+		version += "-" + commit
+	}
+	return version
+}
+
 func UserAgent() string {
-	return glectlUserAgent + version
+	return fmt.Sprintf("glectl/%s", Version())
 }
 
 // GetCredentials loads credentials from Env and returns them as `userid` `token`
