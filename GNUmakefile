@@ -1,12 +1,13 @@
 TEST?=$$(go list ./... |grep -v 'vendor')
 GOFMT_FILES?=$$(find . -name '*.go' |grep -v vendor)
 PKG_NAME=glectl
+GOFLAGS = -ldflags="-X github.com/norrland/glectl/helpers.Commit=$(shell git rev-parse --short HEAD)"
 
 default: build
 
 build: fmtcheck
 	$(shell ./scripts/get_gitref.sh > helpers/git-ref.txt)
-	@go build
+	@go build $(GOFLAGS) .
 
 install:
 	go install
