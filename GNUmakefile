@@ -6,7 +6,6 @@ GOFLAGS = -ldflags="-X github.com/norrland/glectl/helpers.Commit=$(shell git rev
 default: build
 
 build: fmtcheck
-	$(shell ./scripts/get_gitref.sh > helpers/git-ref.txt)
 	@go build $(GOFLAGS) .
 
 install:
