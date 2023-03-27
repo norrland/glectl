@@ -3,7 +3,6 @@ package helper
 import (
 	_ "embed"
 	"fmt"
-	"log"
 	"os"
 	"strings"
 
