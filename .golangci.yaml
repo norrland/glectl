@@ -1,0 +1,21 @@
+---
+linters:
+  disable-all: true
+  enable:
+    - dogsled
+    - gocritic
+    - gofmt
+    - gosimple
+    - govet
+    - misspell
+    - staticcheck
+    - unused
+    - whitespace
+
+linters-settings:
+  staticcheck:
+    checks:
+      - all
+
+max-issues-per-linter: 0
+max-same-issues: 0
