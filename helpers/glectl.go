@@ -12,7 +12,6 @@ import (
 
 var version = "0.0.1"
 
-//go:embed git-ref.txt
 var Commit string
 
 func Version() string {
