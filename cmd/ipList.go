@@ -10,6 +10,7 @@ import (
 	"strings"
 	"text/tabwriter"
 
+	"github.com/glesys/glesys-go/v7"
 	helper "github.com/norrland/glectl/helpers"
 	"github.com/spf13/cobra"
 )
@@ -27,7 +28,7 @@ to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		client := helper.NewClient()
 
-		ips, err := client.IPs.Reserved(context.Background())
+		ips, err := client.IPs.Reserved(context.Background(), glesys.ReservedIPsParams{})
 		if err != nil {
 			cobra.CheckErr(err)
 		}
