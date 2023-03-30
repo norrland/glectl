@@ -86,8 +86,6 @@ func init() {
 	ipListCmd.MarkFlagsMutuallyExclusive("ipv4", "ipv6")
 }
 
-func do_listips() {}
-
 func list_inetf(ipv4 bool, ipv6 bool) string {
 	if ipv4 {
 		return "ipv4"
