@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/glesys/glesys-go/v6"
+	"github.com/glesys/glesys-go/v7"
 )
 
 var version = "0.0.3"
