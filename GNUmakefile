@@ -9,7 +9,7 @@ build: fmtcheck
 	@go build $(GOFLAGS) .
 
 install:
-	go install
+	go install $(GOFLAGS) .
 
 test: fmtcheck
 	go test $(TEST) || exit 1
